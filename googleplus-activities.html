@@ -31,28 +31,56 @@
       // The provided key works for this sample only when run from
       // https://google-api-javascript-client.googlecode.com/hg/samples/authSample.html
       // To use in your own application, replace this API key with your own.
-      var apiKey = '';
+      var apiKey = 'AIzaSyAkdQ6lNv3bgYC6nZgxjRgHVrEHlOxgUU0';
 
       // Use a button to handle authentication the first time.
       function handleClientLoad() {
         gapi.client.setApiKey(apiKey);
         makeApiCall();
+        makeListCall();
       }
 
+      function makeListCall(){
+        gapi.client.load('plus', 'v1', function() {
+        var request = gapi.client.plus.activities.list({
+        //  'query' : 'me'
+        'userId' : '+JenniferRodriguez25',
+        'collection' : 'public'
+      });
+
+
+      request.execute(function(resp) {
+        var numItems = resp.items.length;
+        var hed=document.createElement('h2');
+        hed.appendChild(document.createTextNode('This are my activities'));
+        document.getElementById('cont2').appendChild(hed);
+        for (var i = 0; i < numItems; i++) {
+          var heading = document.createElement('h3');
+          heading.appendChild(document.createTextNode('ACTIVITY_ID: '+ resp.items[i].id + '|' +
+          ' ACTIVITY_KIND: '+ resp.items[i].object.objectType + '|'+
+          ' ACTIVITY_CONTENT ' + resp.items[i].object.content + '|' ));
+              if(resp.items[i].location.kind=='plus#place'){
+                heading.appendChild(document.createTextNode(' ACTIVITY_LOCATION ' + resp.items[i].location.displayName));
+
+              }
+          document.getElementById('cont').appendChild(heading);
+        }
+          });
+      });
+
+      }
       // Load the API and make an API call.  Display the results on the screen.
       function makeApiCall() {
         gapi.client.load('plus', 'v1', function() {
           var request = gapi.client.plus.people.get({
-            'userId': ''
-            // For instance: 
-            // 'userId': '+GregorioRobles'
+             'userId': '+JenniferRodriguez25'
           });
           request.execute(function(resp) {
             var heading = document.createElement('h4');
             var image = document.createElement('img');
             image.src = resp.image.url;
             heading.appendChild(image);
-            heading.appendChild(document.createTextNode(resp.displayName));
+            heading.appendChild(document.createTextNode(''+resp.displayName));
 
             document.getElementById('content').appendChild(heading);
           });
@@ -60,6 +88,8 @@
       }
     </script>
     <script src="https://apis.google.com/js/client.js?onload=handleClientLoad"></script>
+    <div id="cont2"></div>
+    <div id="cont"></div>
     <div id="content"></div>
     <p>Retrieves your profile name (and picture) using the Google Plus API.</p>
   </body>
